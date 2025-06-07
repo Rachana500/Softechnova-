@@ -1,0 +1,61 @@
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+mongoose.connect('mongodb:                                                                              
+
+                              
+const JobSeeker = mongoose.model('//localhost/job-portal', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define the job seeker model
+const JobSeeker = mongoose.model('JobSeeker', {
+    name: String,
+    email: String,
+    resume: String,
+    applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }]
+});
+
+                               
+const JobOpening = mongoose.model('// Define the job opening model
+const JobOpening = mongoose.model('JobOpening', {
+    title: String,
+    description: String,
+    requirements: String,
+    company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' }
+});
+
+                               
+const Application = mongoose.model('// Define the application model
+const Application = mongoose.model('Application', {
+    jobSeeker: { type: mongoose.Schema.Types.ObjectId, ref: 'JobSeeker' },
+    jobOpening: { type: mongoose.Schema.Types.ObjectId, ref: 'JobOpening' },
+    status: String
+});
+
+                           
+app.post('// Create a new job opening
+app.post('/job-openings', async (req, res) => {
+    const jobOpening = new JobOpening({ title: req.body.title, description: req.body.description, requirements: req.body.requirements });
+    await jobOpening.save();
+    res.send('Job opening created successfully');
+});
+
+                       
+app.get('// Get all job openings
+app.get('/job-openings', async (req, res) => {
+    const jobOpenings = await JobOpening.find();
+    res.json(jobOpenings);
+});
+
+                  
+app.post('// Apply for a job
+app.post('/apply', async (req, res) => {
+    const application = new Application({ jobSeeker: req.body.jobSeekerId, jobOpening: req.body.jobOpeningId, status: 'Pending' });
+    await application.save();
+    res.send('Application submitted successfully');
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+});
