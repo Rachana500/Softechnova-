@@ -1,0 +1,63 @@
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+// Connect to MongoDB
+mongoose.connect('mongodb:                                                                                   
+
+                          
+const Course = mongoose.model('//localhost/course-platform', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define the course model
+const Course = mongoose.model('Course', {
+    title: String,
+    description: String,
+    price: Number,
+    instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'Instructor' }
+});
+
+                              
+const Instructor = mongoose.model('// Define the instructor model
+const Instructor = mongoose.model('Instructor', {
+    name: String,
+    bio: String,
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
+});
+
+                           
+const Student = mongoose.model('// Define the student model
+const Student = mongoose.model('Student', {
+    name: String,
+    email: String,
+    purchasedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
+});
+
+                      
+app.post('// Create a new course
+app.post('/courses', async (req, res) => {
+    const course = new Course({ title: req.body.title, description: req.body.description, price: req.body.price });
+    await course.save();
+    res.send('Course created successfully');
+});
+
+                  
+app.get('// Get all courses
+app.get('/courses', async (req, res) => {
+    const courses = await Course.find();
+    res.json(courses);
+});
+
+                    
+app.post('// Purchase a course
+app.post('/purchase', async (req, res) => {
+    const student = await Student.findById(req.body.studentId);
+    const course = await Course.findById(req.body.courseId);
+    student.purchasedCourses.push(course);
+    await student.save();
+    res.send('Course purchased successfully');
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+});
