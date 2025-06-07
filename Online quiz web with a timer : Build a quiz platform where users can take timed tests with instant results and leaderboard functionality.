@@ -1,0 +1,95 @@
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+mongoose.connect('mongodb:                                                                                 
+
+                        
+const Quiz = mongoose.model('//localhost/quiz-platform', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define the quiz model
+const Quiz = mongoose.model('Quiz', {
+    title: String,
+    description: String,
+    timer: Number,
+    questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }]
+});
+
+                            
+const Question = mongoose.model('// Define the question model
+const Question = mongoose.model('Question', {
+    quizId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
+    text: String,
+    options: [String]
+});
+
+                               
+const UserAnswer = mongoose.model('// Define the user answer model
+const UserAnswer = mongoose.model('UserAnswer', {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
+    answer: String
+});
+
+                         
+const Score = mongoose.model('// Define the score model
+const Score = mongoose.model('Score', {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    quizId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
+    score: Number
+});
+
+                    
+app.post('// Create a new quiz
+app.post('/quizzes', async (req, res) => {
+    const quiz = new Quiz({ title: req.body.title, description: req.body.description, timer: req.body.timer });
+    await quiz.save();
+    res.send('Quiz created successfully');
+});
+
+                  
+app.get('// Get all quizzes
+app.get('/quizzes', async (req, res) => {
+    const quizzes = await Quiz.find();
+    res.json(quizzes);
+});
+
+                
+app.post('// Submit a quiz
+app.post('/submit-quiz', async (req, res) => {
+    const userAnswers = req.body.userAnswers;
+    const score = await calculateScore(userAnswers);
+    const scoreDoc = new Score({ userId: req.body.userId, quizId: req.body.quizId, score: score });
+    await scoreDoc.save();
+    res.send('Quiz submitted successfully');
+});
+
+                  
+async function calculateScore(userAnswers) {
+    let score = 0;
+    for (const answer of userAnswers) {
+        const question = await Question.findById(answer.questionId);
+        if (question.options[answer.answer] === question.correctOption) {
+            score++;
+        }
+    }
+    return score;
+}
+
+app.listen(3000, () => {
+    console.log('// Calculate score
+async function calculateScore(userAnswers) {
+    let score = 0;
+    for (const answer of userAnswers) {
+        const question = await Question.findById(answer.questionId);
+        if (question.options[answer.answer] === question.correctOption) {
+            score++;
+        }
+    }
+    return score;
+}
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+});
