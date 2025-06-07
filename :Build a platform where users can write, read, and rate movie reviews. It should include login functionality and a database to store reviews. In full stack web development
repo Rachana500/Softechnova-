@@ -1,0 +1,67 @@
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+// Connect to MongoDB
+mongoose.connect('mongodb:                                                                                 
+
+                        
+const User = mongoose.model('//localhost/movie-reviews', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define the user model
+const User = mongoose.model('User', {
+    username: String,
+    password: String
+});
+
+                          
+const Review = mongoose.model('// Define the review model
+const Review = mongoose.model('Review', {
+    title: String,
+    content: String,
+    rating: Number,
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+
+                      
+app.post('// Register a new user
+app.post('/register', async (req, res) => {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const user = new User({ username: req.body.username, password: hashedPassword });
+    await user.save();
+    res.send('User registered successfully');
+});
+
+               
+app.post('// Login a user
+app.post('/login', async (req, res) => {
+    const user = await User.findOne({ username: req.body.username });
+    if (!user) {
+        return res.status(401).send('Invalid username or password');
+    }
+    const isValidPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!isValidPassword) {
+        return res.status(401).send('Invalid username or password');
+    }
+    res.send('User logged in successfully');
+});
+
+                      
+app.post('// Create a new review
+app.post('/reviews', async (req, res) => {
+    const review = new Review({ title: req.body.title, content: req.body.content, rating: req.body.rating, userId: req.user._id });
+    await review.save();
+    res.send('Review created successfully');
+});
+
+                  
+app.get('// Get all reviews
+app.get('/reviews', async (req, res) => {
+    const reviews = await Review.find().populate('userId');
+    res.json(reviews);
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+});
